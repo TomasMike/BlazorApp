@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@using BlazorApp.Helpers
+@using System.Text
+@inject NavigationManager NavigationManager
+
+
+<div id="@GetId()" class="hexagon" style="top:@Top;left:@Left">
+        <div class="h1"></div>
+        <div class="h2"></div>
+        <div class="h3"></div>
+    <button @onclick="Send">HexBtn</button>
+</div>
+@code{
+
+    [Parameter]
+    public int TopCoord { get; set; }
+
+    [Parameter]
+    public int LeftCoord { get; set; }
+
+    private HubConnection hubConnection;
+
+    public string Top => (LeftCoord % 2 == 0 ? TopCoord * 52 : TopCoord * 52 + 26).ToString() + "px";
+    public string Left => (LeftCoord * 43).ToString() + "px";
+    public List<BlazorApp.Helpers.Component> Components;
+    public MarkupString Text;
+
+    public MarkupString GetText()
+    {
+        var sb = new StringBuilder();
+        foreach (var c in Components)
+        {
+            sb.Append(c.ToString() + Environment.NewLine);
+        }
+
+
+        return new MarkupString(sb.ToString());
+    }
+
+
+    protected override void OnInitialized()
+    { }
+
+    private string GetId()
+    {
+        return  TopCoord + "_" + LeftCoord;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //UpdateClearing(GameManager.GetClearingData(ClearingNumber));
+
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/testHub"))
+            .Build();
+
+        hubConnection.On<ClearingDataModel>("RefreshClearing", (dm) =>
+        {
+            //UpdateClearing(GameManager.GetClearingData(ClearingNumber));
+            StateHasChanged();
+        });
+
+
+        await hubConnection.StartAsync();
+    }
+
+    async Task Send() =>
+        await hubConnection.SendAsync("HexClicked", GetId());
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
+}

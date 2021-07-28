@@ -1,0 +1,92 @@
+@page "/game"
+@inject IJSRuntime JS;
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.AspNetCore.SignalR.Client
+@using BlazorApp.Helpers
+
+@implements IAsyncDisposable
+@inject NavigationManager NavigationManager
+
+
+<div style="display:flex">
+    <div id="clearingContainer">
+    @{
+        for (int i = 1; i <= 12; i++)
+        {
+            <Clearing ClearingNumber="@i"></Clearing>
+        }
+    }
+
+    </div>
+    <div id="sidePanel">
+        <button class="btn btn-primary" @onclick="StartGame">Start</button>
+        <ul id="messagesList">
+            @foreach (var message in messages)
+            {
+                <li>@message</li>
+            }
+        </ul>
+    </div>
+</div>
+@code {
+    private int currentCount = 0;
+    private List<Clearing> Clearings;
+    private HubConnection hubConnection;
+    private List<string> messages = new List<string>();
+    [Parameter]
+    public RenderFragment ClearingsContent { get; set; }
+
+    public ComponentBase Modal { get; set; }
+    private void StartGame()
+    {
+        //var x = JS.InvokeAsync<bool>("confirm", "si si isty?");
+
+        Modal = new Modal();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GameManager.InitBoard();
+
+        var b = new HubConnectionBuilder();
+        var x = 0.1+0.1+0.1;
+        try
+        {
+            hubConnection = b.WithUrl(NavigationManager.ToAbsoluteUri("/testHub")).Build();
+        }
+        catch (Exception)
+        {
+            var q = 2;
+            //throw;
+        }
+
+
+        hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/testHub"))
+                .Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            var encodedMsg = $"{user}: {message}";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        //await hubConnection.StartAsync();
+    }
+
+    async Task Send() =>
+        await hubConnection.SendAsync("SendMessage", "", "");
+
+    public bool IsConnected =>
+hubConnection.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
+
+
+
+}

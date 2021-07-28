@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@using BlazorApp.Helpers
+@using System.Text
+@inject NavigationManager NavigationManager
+
+
+<div id="@Id" class="clearing" style="top:@Top;left:@Left">
+    <span>Clearing @ClearingNumber</span><br />
+    <span>@Text</span>
+    <button @onclick="Send">Test</button>
+</div>
+@code{
+
+    [Parameter]
+    public int ClearingNumber { get; set; }
+
+    private HubConnection hubConnection;
+
+    public string Id => $"clearing{ClearingNumber}";
+    public string Top;
+    public string Left;
+    public List<BlazorApp.Helpers.Component> Components;
+    public MarkupString Text;
+
+    public MarkupString GetText()
+    {
+        var sb = new StringBuilder();
+        foreach (var c in Components)
+        {
+            sb.Append(c.ToString() + Environment.NewLine);
+        }
+
+        return new MarkupString(sb.ToString());
+    }
+
+    private void UpdateClearing(ClearingDataModel model)
+    {
+        Top = model.Top + "px";
+        Left = model.Left + "px";
+        Components = model.Components;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        UpdateClearing(GameManager.GetClearingData(ClearingNumber));
+
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/testHub"))
+            .Build();
+
+        hubConnection.On<ClearingDataModel>("RefreshClearing", (dm) =>
+        {
+            UpdateClearing(GameManager.GetClearingData(ClearingNumber));
+            StateHasChanged();
+        });
+
+
+        await hubConnection.StartAsync();
+    }
+
+    async Task Send() =>
+        await hubConnection.SendAsync("ClearingClicked", ClearingNumber);
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
+}
