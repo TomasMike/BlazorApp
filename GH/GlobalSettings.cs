@@ -4,10 +4,6 @@ namespace BlazorApp.GH
 {
     public static class GlobalSettings
     {
-        public static int HexHeight;
-
-        public static int HexWidth;
-
         public static HexOrientation HexOrientationConfiguration;
 
         public static string q = "";
@@ -50,5 +46,35 @@ namespace BlazorApp.GH
         public int Width;
         public int InnerPartHeight;
         public int InnerPartWidth;
+    }
+
+    public interface IGameComponent
+    {
+        string DisplayText();
+    }
+
+    public class Character : IGameComponent
+    {
+        public CharacterType CharacterType;
+
+        public string DisplayText()
+        {
+            return CharacterType.ToString();
+        }
+    }
+
+    public enum CharacterType
+    {
+        Tinkerer,
+        Mindthief,
+        Cragheart,
+        Rogue,
+        Spellweaver,
+        Brute
+    }
+
+    public class Player
+    {
+        public string Name;
     }
 }

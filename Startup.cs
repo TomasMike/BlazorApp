@@ -56,7 +56,6 @@ namespace BlazorApp
             }
 
             app.UseStaticFiles();
-
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
@@ -64,7 +63,11 @@ namespace BlazorApp
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
                 endpoints.MapHub<TestHub>("/testHub");
+                endpoints.MapHub<GloomhavenHub>("/gloomhavenHub");
             });
+
+
+
         }
     }
 }

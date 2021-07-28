@@ -1,14 +1,16 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
 @using System.Text
 @using BlazorApp.GH
+@using BlazorApp.Pages 
 @inject NavigationManager NavigationManager
 
 
-<div id="@GetId()" class="hexagon" style="top:@Top;left:@Left">
-    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h1"></div>
-    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h2"></div>
-    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h3"></div>
-    @*<button @onclick="Send">HexBtn</button>*@
+<div id="@GetId()" class="hexagon" style="top:@Top;left:@Left;width:@HexWidth;height:@HexHeight">
+    @GetText()
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h1" @onclick="Click"></div>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h2" @onclick="Click"></div>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h3" @onclick="Click"></div>
+   @* <button style="position:absolute;align-content:center" @onclick="Send">HexBtn</button>*@
 </div>
 @code{
 
@@ -17,31 +19,35 @@
     [Parameter]
     public int LeftCoord { get; set; }
     [Parameter]
-   
+    public Gloomhaven Board { get; set; }
+
     public string HexInnerComponentHeight { get; set; }
     public string HexInnerComponentWidth { get; set; }
 
+    public List<IGameComponent> Components = new List<IGameComponent>();
 
     private HubConnection hubConnection;
-
-    public string Top;
-
-    //(LeftCoord % 2 == 0 ? TopCoord* 52 : TopCoord* 52 + 26).ToString() + "px";
-    public string Left;
-    public MarkupString Text;
-
-
+    private string Top;
+    private string Left;
+    private MarkupString Text;
+    private HexSizeConfig hexSizeConfig;
+    private string HexHeight;
+    private string HexWidth;
 
 
     protected override void OnInitialized()
     {
         var s = 3;
 
-        var hexConfig = GlobalSettings.HexSizeConfigurations[s];
-        Top = (LeftCoord % 2 == 0 ? TopCoord * hexConfig.Height : TopCoord * hexConfig.Height + (hexConfig.Height / 2)).ToString() + "px";
-        Left = (LeftCoord * hexConfig.Width).ToString() + "px";
-        HexInnerComponentHeight = hexConfig.InnerPartHeight + "px";
-        HexInnerComponentWidth = hexConfig.InnerPartWidth + "px";
+        hexSizeConfig = GlobalSettings.HexSizeConfigurations[s];
+        Top = (LeftCoord % 2 == 0 ? TopCoord * hexSizeConfig.Height : TopCoord * hexSizeConfig.Height + (hexSizeConfig.Height / 2)).ToString() + "px";
+        Left = (LeftCoord * hexSizeConfig.Width).ToString() + "px";
+        HexInnerComponentHeight = hexSizeConfig.InnerPartHeight + "px";
+        HexInnerComponentWidth = hexSizeConfig.InnerPartWidth + "px";
+        HexWidth = hexSizeConfig.Width + "px";
+        HexHeight = hexSizeConfig.Height + "px";
+
+        
     }
 
     private string GetId()
@@ -49,28 +55,31 @@
         return TopCoord + "_" + LeftCoord;
     }
 
+    private string GetText()
+    {
+
+        StringBuilder sb = new StringBuilder();
+        foreach (var component in Components)
+        {
+            sb.AppendLine(component.DisplayText());
+        }
+        return sb.ToString();
+
+    }
+
     protected override async Task OnInitializedAsync()
     {
 
-        //UpdateClearing(GameManager.GetClearingData(ClearingNumber));
 
-
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/testHub"))
-            .Build();
-
-        hubConnection.On<int>("RefreshClearing", (dm) =>
-        {
-            //UpdateClearing(GameManager.GetClearingData(ClearingNumber));
-            StateHasChanged();
-        });
-
-
-        await hubConnection.StartAsync();
     }
 
-    async Task Send() =>
-        await hubConnection.SendAsync("HexClicked", GetId());
+    public string Test(string s)
+    {
+        return "dal si" + s;
+    }
+
+    private void Click() =>
+        Board.Click(GetId());
 
     public async ValueTask DisposeAsync()
     {
