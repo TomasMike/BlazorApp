@@ -1,49 +1,52 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
-@using BlazorApp.Helpers
 @using System.Text
+@using BlazorApp.GH
 @inject NavigationManager NavigationManager
 
 
 <div id="@GetId()" class="hexagon" style="top:@Top;left:@Left">
-        <div class="h1"></div>
-        <div class="h2"></div>
-        <div class="h3"></div>
-    <button @onclick="Send">HexBtn</button>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h1"></div>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h2"></div>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth" class="h3"></div>
+    @*<button @onclick="Send">HexBtn</button>*@
 </div>
 @code{
 
     [Parameter]
     public int TopCoord { get; set; }
-
     [Parameter]
     public int LeftCoord { get; set; }
+    [Parameter]
+   
+    public string HexInnerComponentHeight { get; set; }
+    public string HexInnerComponentWidth { get; set; }
+
 
     private HubConnection hubConnection;
 
-    public string Top => (LeftCoord % 2 == 0 ? TopCoord * 52 : TopCoord * 52 + 26).ToString() + "px";
-    public string Left => (LeftCoord * 43).ToString() + "px";
-    public List<BlazorApp.Helpers.Component> Components;
+    public string Top;
+
+    //(LeftCoord % 2 == 0 ? TopCoord* 52 : TopCoord* 52 + 26).ToString() + "px";
+    public string Left;
     public MarkupString Text;
 
-    public MarkupString GetText()
-    {
-        var sb = new StringBuilder();
-        foreach (var c in Components)
-        {
-            sb.Append(c.ToString() + Environment.NewLine);
-        }
 
-
-        return new MarkupString(sb.ToString());
-    }
 
 
     protected override void OnInitialized()
-    { }
+    {
+        var s = 3;
+
+        var hexConfig = GlobalSettings.HexSizeConfigurations[s];
+        Top = (LeftCoord % 2 == 0 ? TopCoord * hexConfig.Height : TopCoord * hexConfig.Height + (hexConfig.Height / 2)).ToString() + "px";
+        Left = (LeftCoord * hexConfig.Width).ToString() + "px";
+        HexInnerComponentHeight = hexConfig.InnerPartHeight + "px";
+        HexInnerComponentWidth = hexConfig.InnerPartWidth + "px";
+    }
 
     private string GetId()
     {
-        return  TopCoord + "_" + LeftCoord;
+        return TopCoord + "_" + LeftCoord;
     }
 
     protected override async Task OnInitializedAsync()
@@ -56,7 +59,7 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/testHub"))
             .Build();
 
-        hubConnection.On<ClearingDataModel>("RefreshClearing", (dm) =>
+        hubConnection.On<int>("RefreshClearing", (dm) =>
         {
             //UpdateClearing(GameManager.GetClearingData(ClearingNumber));
             StateHasChanged();

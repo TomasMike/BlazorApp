@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BlazorApp.Helpers
+namespace BlazorApp.Root
 {
     public static class ClearingHelper
     {
-   
+
 
         public static readonly Dictionary<int, TopLeftStr> clearingLocationData =
         new Dictionary<int, TopLeftStr>
@@ -64,7 +64,7 @@ namespace BlazorApp.Helpers
 
     public static class GameManager
     {
-        private static Dictionary<int,ClearingDataModel> Clearings = new Dictionary<int, ClearingDataModel>();
+        private static Dictionary<int, ClearingDataModel> Clearings = new Dictionary<int, ClearingDataModel>();
 
 
         public static void InitBoard()
@@ -78,7 +78,7 @@ namespace BlazorApp.Helpers
             for (int i = 1; i <= 12; i++)
             {
                 var s = ClearingHelper.clearingLocationData[i];
-                Clearings.Add(i,new ClearingDataModel(s.Top, s.Left));
+                Clearings.Add(i, new ClearingDataModel(s.Top, s.Left));
             }
         }
 
@@ -103,7 +103,7 @@ namespace BlazorApp.Helpers
 
     public struct TopLeftStr
     {
-        public TopLeftStr(int top,int left)
+        public TopLeftStr(int top, int left)
         {
             Top = top;
             Left = left;

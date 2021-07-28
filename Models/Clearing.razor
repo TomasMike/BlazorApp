@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
-@using BlazorApp.Helpers
+@using BlazorApp.Root
 @using System.Text
 @inject NavigationManager NavigationManager
 
@@ -19,7 +19,7 @@
     public string Id => $"clearing{ClearingNumber}";
     public string Top;
     public string Left;
-    public List<BlazorApp.Helpers.Component> Components;
+    public List<Root.Component> Components;
     public MarkupString Text;
 
     public MarkupString GetText()
@@ -42,7 +42,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         UpdateClearing(GameManager.GetClearingData(ClearingNumber));
 
 
