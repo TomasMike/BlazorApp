@@ -17,7 +17,7 @@ namespace BlazorApp
         public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
-            GHGameManager.ihub = (IHubContext<GloomhavenHub>)host.Services.GetService(typeof(IHubContext<GloomhavenHub>));
+            GHGameManager.ihub = (IHubContext<Hub<IGloomhavenHubClient>>)host.Services.GetService(typeof(IHubContext<Hub<IGloomhavenHubClient>>));
             host.Run();
         }
 

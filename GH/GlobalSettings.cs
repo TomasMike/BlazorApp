@@ -73,8 +73,25 @@ namespace BlazorApp.GH
         Brute
     }
 
+    public enum TerrainType
+    {
+        Obstacle,
+        DifficultTerrain,
+
+    }
+
     public class Player
     {
         public string Name;
+    }
+
+    public class TerrainComponent : IGameComponent
+    {
+        public TerrainType TerrainType;
+
+        public string DisplayText()
+        {
+            return "";
+        }
     }
 }

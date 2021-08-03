@@ -22,7 +22,9 @@
 }
 
 .hexGrid {
-    position: fixed
+    position: absolute;
+    margin:10px;
+    top:50px;
 }
 
 .hexagon {
@@ -32,12 +34,10 @@
     .hexagon div {
         background: red;
         position: absolute;
-        height: 29px;
-        width: 50px;
         border-style: solid;
         border-color: black;
         border-width: 0px 1px;
-        margin:0px;
+        margin: 0px;
     }
 
 .h1 {
