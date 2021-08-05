@@ -14,7 +14,6 @@
     @{
         for (int i = 1; i <= 12; i++)
         {
-            <Clearing ClearingNumber="@i"></Clearing>
         }
     }
 
@@ -31,7 +30,6 @@
 </div>
 @code {
     private int currentCount = 0;
-    private List<Clearing> Clearings;
     private HubConnection hubConnection;
     private List<string> messages = new List<string>();
     [Parameter]

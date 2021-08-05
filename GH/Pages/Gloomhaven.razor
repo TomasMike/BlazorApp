@@ -13,15 +13,22 @@
 <div>
     <div class="hexGrid">
         @{
-            for (int i = 0; i < Hexes.Count(); i++)
+          
+
+        for (int i = 0; i < 1; i++)
+        {
+            for (int j = 0; j < 1; j++)
             {
-                <Hex @ref="Hexes[i]"></Hex>
+                <Hex LeftCoord="j" TopCoord="i" Board="this"></Hex>
             }
+        }
         }
 
     </div>
     <div id="sidePanel">
         <button class="btn btn-primary" @onclick="Start">start</button>
+        <button class="btn btn-primary" @onclick="Test">test</button>
+        <button class="btn btn-primary" @onclick="ToggleMoveState">Move</button>
         <ul id="messagesList">
             @foreach (var message in messages)
             {
@@ -33,7 +40,8 @@
 @code {
     private HubConnection hubConnection;
     private List<string> messages = new List<string>();
-    private List<Hex> Hexes = new List<Hex>();
+    public List<Hex> Hexes = new List<Hex>();
+
 
 
     private void StartGame()
@@ -41,20 +49,15 @@
         //var x = JS.InvokeAsync<bool>("confirm", "si si isty?");
     }
 
+
     protected override async Task OnInitializedAsync()
     {
-        for (int j = 0; j < 1; j++)
-        {
-            for (int i = 0; i <= 1; i++)
-            {
-                Hexes.Add(new Hex(j,i));
-            }
-        }
+        #region SIGNALR 
 
 
         hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavigationManager.ToAbsoluteUri("/gloomhavenHub"))
-                .Build();
+            .WithUrl(NavigationManager.ToAbsoluteUri("/gloomhavenHub"))
+            .Build();
 
         hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
         {
@@ -79,28 +82,39 @@
         await hubConnection.StartAsync();
 
         Console.WriteLine($"Board connected.");
-
+        #endregion
     }
 
     public async Task Send() =>
-     await hubConnection.SendAsync("SendMessage", "", "");
+ await hubConnection.SendAsync("SendMessage", "", "");
 
     public async Task Click(string hexId) =>
         await hubConnection.SendAsync("HexClicked", hexId);
 
     public async Task Start()
     {
-        await hubConnection.SendAsync("StartClicked");
+        Hexes.FirstOrDefault()?.Components.Add(new Character() { CharacterType = CharacterType.Mindthief });
+        StateHasChanged();
+        //await hubConnection.SendAsync("StartClicked");
+    }
+
+    public async Task Test()
+    {
+        Hexes.FirstOrDefault().ChangeColor();
     }
 
     public bool IsConnected =>
 hubConnection.State == HubConnectionState.Connected;
-
+        
     public async ValueTask DisposeAsync()
     {
-        await hubConnection.DisposeAsync();
+        if(hubConnection != null)
+            await hubConnection.DisposeAsync();
     }
 
+    void ToggleMoveState()
+    {
 
+    }
 
 }

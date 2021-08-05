@@ -38,6 +38,7 @@
         border-color: black;
         border-width: 0px 1px;
         margin: 0px;
+        z-index:-1;
     }
 
 .h1 {

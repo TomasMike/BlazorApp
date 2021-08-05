@@ -6,10 +6,10 @@
 
 
 <div id="@GetId()" class="hexagon" style="top:@Top;left:@Left;">
-    @GetText()
-    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;" class="h1" @onclick="Click"></div>
-    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;" class="h2" @onclick="Click"></div>
-    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;" class="h3" @onclick="Click"></div>
+   <p> @GetText() </p>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;background:@InnerHexComponentColor" class="h1" @onclick="Click"></div>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;background:@InnerHexComponentColor" class="h2" @onclick="Click"></div>
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;background:@InnerHexComponentColor" class="h3" @onclick="Click"></div>
     @* <button style="position:absolute;align-content:center" @onclick="Send">HexBtn</button>*@
 </div>
 @code{
@@ -20,15 +20,31 @@
     {
         LeftCoord = left;
         TopCoord = top;
+
+        StateHasChanged();
     }
 
+    private Gloomhaven _board;
+    [Parameter]
+    public Gloomhaven Board
+    {
+        get
+        {
+            return _board;
+        }
+        set
+        {
+            _board = value;
+            if(!_board.Hexes.Contains(this))
+                _board.Hexes.Add(this);
+        }
+    }
 
     [Parameter]
     public int TopCoord { get; set; }
     [Parameter]
     public int LeftCoord { get; set; }
-    [Parameter]
-    public Gloomhaven Board { get; set; }
+
 
     public string HexInnerComponentHeight { get; set; }
     public string HexInnerComponentWidth { get; set; }
@@ -36,29 +52,40 @@
     public List<IGameComponent> Components = new List<IGameComponent>();
 
     private HubConnection hubConnection;
-    private string Top;
-    private string Left;
+    private string Top => (LeftCoord % 2 == 0 ? TopCoord * hexSizeConfig.Height : TopCoord * hexSizeConfig.Height + (hexSizeConfig.Height / 2)).ToString() + "px";
+    private string Left => (LeftCoord * hexSizeConfig.Width).ToString() + "px";
     private MarkupString Text;
     private HexSizeConfig hexSizeConfig;
     private string HexHeight;
     private string HexWidth;
+    private string InnerHexComponentColor = "red";
 
     private string TopInner = "0px";
     private string LeftInner = "0px";
+
+    public void ChangeColor()
+    {
+        if (InnerHexComponentColor == "red")
+            InnerHexComponentColor = "green";
+        else if (InnerHexComponentColor == "green")
+            InnerHexComponentColor = "blue";
+        else
+            InnerHexComponentColor = "red";
+        StateHasChanged();
+    }
+
+    #region SIGNALR 
+    #endregion
 
     protected override void OnInitialized()
     {
         var s = 3;
 
         hexSizeConfig = GlobalSettings.HexSizeConfigurations[s];
-        Top = (LeftCoord % 2 == 0 ? TopCoord * hexSizeConfig.Height : TopCoord * hexSizeConfig.Height + (hexSizeConfig.Height / 2)).ToString() + "px";
-        Left = (LeftCoord * hexSizeConfig.Width).ToString() + "px";
         HexInnerComponentHeight = hexSizeConfig.InnerPartHeight + "px";
         HexInnerComponentWidth = hexSizeConfig.InnerPartWidth + "px";
         HexWidth = hexSizeConfig.Width + "px";
         HexHeight = hexSizeConfig.Height + "px";
-
-
     }
 
     private string GetId()
@@ -72,8 +99,10 @@
         StringBuilder sb = new StringBuilder();
         foreach (var component in Components)
         {
-            sb.AppendLine(component.DisplayText());
+            sb.AppendLine($"{component.DisplayText()}");
         }
+
+
         return sb.ToString();
 
     }
@@ -91,6 +120,7 @@
 
     private void Click()
     {
+        ChangeColor();
         //Board.Click(GetId());
     }
 
