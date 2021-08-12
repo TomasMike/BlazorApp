@@ -27,28 +27,52 @@
     top:50px;
 }
 
+
+
 .hexagon {
     position: absolute;
 }
 
-    .hexagon div {
-        background: red;
+    .hexagon>div>div {
         position: absolute;
         border-style: solid;
         border-color: black;
         border-width: 0px 1px;
         margin: 0px;
-        z-index:-1;
+        z-index:1;
     }
 
-.h1 {
+div.pointy .h1 {
     transform: rotate(90deg);
 }
 
-.h2 {
+div.pointy .h2 {
     transform: rotate(30deg);
 }
 
-.h3 {
+div.pointy .h3 {
     transform: rotate(-30deg);
 }
+
+div.flat .h1 {
+    transform: rotate(90deg);
+}
+
+div.flat .h2 {
+    transform: rotate(30deg);
+}
+
+div.flat .h3 {
+    transform: rotate(-30deg);
+}
+
+/*
+p.hexText{
+    top:10px;
+    left:10px;
+    z-index:2;
+    position:absolute;
+}*/
+
+
+

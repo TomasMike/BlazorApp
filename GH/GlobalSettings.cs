@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using BlazorApp.Models;
+using BlazorApp.GH.Pages;
 
 namespace BlazorApp.GH
 {
@@ -9,89 +14,35 @@ namespace BlazorApp.GH
         public static string q = "";
         public static string q1 => "";
 
+        public static int Size = 30;
+
         public static Dictionary<int, HexSizeConfig> HexSizeConfigurations = new Dictionary<int, HexSizeConfig>
         {
             {
                 1,
                 new HexSizeConfig()
                 {
-                    Height = 50,
-                    Width = 43,
-                    InnerPartHeight = 29,
-                    InnerPartWidth = 50,
+                    Size = 100,
+                    Height = 30,
+                    Width = 52,
+                    InnerPartHeight = 52,
+                    InnerPartWidth = 30
                 }
             },
             {
                 3,
                 new HexSizeConfig()
                 {
-                    Height = 150,
-                    Width = 129,
-                    InnerPartHeight = 87,
-                    InnerPartWidth = 150,
                 }
             },
         };
     }
 
-    public enum HexOrientation
+    public static class HelperStuff
     {
-        Flat,
-        Pointy
-    }
-
-    public struct HexSizeConfig
-    {
-        public int Height;
-        public int Width;
-        public int InnerPartHeight;
-        public int InnerPartWidth;
-    }
-
-    public interface IGameComponent
-    {
-        string DisplayText();
-    }
-
-    public class Character : IGameComponent
-    {
-        public CharacterType CharacterType;
-
-        public string DisplayText()
+        public static Hex GetHexByCoords(this Gloomhaven gh, int top, int left)
         {
-            return CharacterType.ToString();
-        }
-    }
-
-    public enum CharacterType
-    {
-        Tinkerer,
-        Mindthief,
-        Cragheart,
-        Rogue,
-        Spellweaver,
-        Brute
-    }
-
-    public enum TerrainType
-    {
-        Obstacle,
-        DifficultTerrain,
-
-    }
-
-    public class Player
-    {
-        public string Name;
-    }
-
-    public class TerrainComponent : IGameComponent
-    {
-        public TerrainType TerrainType;
-
-        public string DisplayText()
-        {
-            return "";
+            return gh.Hexes.FirstOrDefault(h => h.TopCoord == top && h.LeftCoord == left);
         }
     }
 }

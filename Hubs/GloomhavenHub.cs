@@ -55,10 +55,4 @@ namespace BlazorApp.Hubs
         //Task HexClicked(string hexId);
     }
 
-    public class TestSimpleClass
-    {
-        public string Name { get; set; }
-        public int Age { get; set; }
-
-    }
 }

@@ -1,30 +1,46 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
 @using System.Text
-@using BlazorApp.GH
 @using BlazorApp.GH.Pages
+@using BlazorApp.GH
 @inject NavigationManager NavigationManager
+<!--<div id="@GetId()" class="hexagon" style="top:@Top;left:@Left;">
 
-
-<div id="@GetId()" class="hexagon" style="top:@Top;left:@Left;">
-   <p> @GetText() </p>
     <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;background:@InnerHexComponentColor" class="h1" @onclick="Click"></div>
     <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;background:@InnerHexComponentColor" class="h2" @onclick="Click"></div>
-    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;background:@InnerHexComponentColor" class="h3" @onclick="Click"></div>
-    @* <button style="position:absolute;align-content:center" @onclick="Send">HexBtn</button>*@
+    <div style="height:@HexInnerComponentHeight;width:@HexInnerComponentWidth;background:@InnerHexComponentColor" class="h3" @onclick="Click"></div>-->
+@* <button style="position:absolute;align-content:center" @onclick="Send">HexBtn</button>*@
+<!--</div>-->
+@*<div id="@GetId()" class="hexagon" style="top:@GetTop();left:@GetLeft();position:absolute">
+    <div style=" width: 0; border-bottom: @TopBottomBorder solid @ComponentColor; border-left: @LeftRightBorder solid transparent; border-right: @LeftRightBorder solid transparent;"></div>
+    <div style="width: @HexWidth; height: @HexHeight; background: @ComponentColor;">
+        @GetText()
+    </div>
+    <div style=" width: 0; border-top: @TopBottomBorder solid @ComponentColor; border-left: @LeftRightBorder solid transparent; border-right: @LeftRightBorder solid transparent;"></div>
+</div>*@
+
+
+<div id="@GetId()" class="hexagon flat" style="top: @GetTop(); left: @GetLeft();height:@GetElementHeightText;width:@GetElementWidthText">
+    <div style="position: relative;">
+        @Text()
+        <div class="h1" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div class="h2" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div class="h3" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+    </div>
 </div>
+
 @code{
 
-    public Hex() { }
+        public Hex() { }
 
-    public Hex(int left, int top)
-    {
-        LeftCoord = left;
-        TopCoord = top;
+        public Hex(int left, int top)
+        {
+            LeftCoord = left;
+            TopCoord = top;
 
-        StateHasChanged();
-    }
+            StateHasChanged();
+        }
 
-    private Gloomhaven _board;
+        private Gloomhaven _board;
     [Parameter]
     public Gloomhaven Board
     {
@@ -35,7 +51,7 @@
         set
         {
             _board = value;
-            if(!_board.Hexes.Contains(this))
+            if (!_board.Hexes.Contains(this))
                 _board.Hexes.Add(this);
         }
     }
@@ -46,65 +62,108 @@
     public int LeftCoord { get; set; }
 
 
-    public string HexInnerComponentHeight { get; set; }
-    public string HexInnerComponentWidth { get; set; }
-
     public List<IGameComponent> Components = new List<IGameComponent>();
 
     private HubConnection hubConnection;
-    private string Top => (LeftCoord % 2 == 0 ? TopCoord * hexSizeConfig.Height : TopCoord * hexSizeConfig.Height + (hexSizeConfig.Height / 2)).ToString() + "px";
-    private string Left => (LeftCoord * hexSizeConfig.Width).ToString() + "px";
-    private MarkupString Text;
+
     private HexSizeConfig hexSizeConfig;
     private string HexHeight;
     private string HexWidth;
-    private string InnerHexComponentColor = "red";
+    private string ComponentColor = "teal";
+    private string InnerComponentWidth;
+    private string InnerComponentHeight;
+    private string InnerComponentTop => (Math.Round(GlobalSettings.Size * 0.4, 0)) + "px";
+    private string InnerComponentLeft => (Math.Round(GlobalSettings.Size * 0.15, 0)) + "px";
 
-    private string TopInner = "0px";
-    private string LeftInner = "0px";
+    // zatial je hex orientation stale flat
+    private double GetInnerElementHeight()
+    {
+        return GlobalSettings.Size;
+    }
+    private string GetInnerElementHeightText => GetInnerElementHeight() + "px";
+
+    private double GetInnerElementWidth()
+    {
+        return Math.Round(Math.Sqrt(3) * GlobalSettings.Size, 0);
+
+    }
+    private string GetInnerElementWidthText => GetInnerElementWidth() + "px";
+
+
+    private double GetElementHeight()
+    {
+        return GetInnerElementWidth();
+    }
+    private string GetElementHeightText => GetElementHeight() + "px";
+
+
+    private double GetElementWidth()
+    {
+        return GlobalSettings.Size * 2;
+    }
+    private string GetElementWidthText => GetElementWidth() + "px";
+
+
+    private string GetTop()
+    {
+        var value = TopCoord * GetElementHeight();
+
+        if (LeftCoord % 2 != 0)
+            value += Math.Round(GetElementHeight() / 2, 0);
+
+        return $"{value}px";
+    }
+
+    private string GetLeft()
+    {
+        var value = Math.Round(LeftCoord * GetElementWidth() * 3 / 4, 0);
+
+        return $"{value}px";
+    }
+
 
     public void ChangeColor()
     {
-        if (InnerHexComponentColor == "red")
-            InnerHexComponentColor = "green";
-        else if (InnerHexComponentColor == "green")
-            InnerHexComponentColor = "blue";
+        //Random r = new Random();
+        //ComponentColor = $"rgb({r.Next(0, 256)},{r.Next(0, 256)},{r.Next(0, 256)})";
+        if (ComponentColor == "red")
+            ComponentColor = "green";
+        else if (ComponentColor == "green")
+            ComponentColor = "blue";
         else
-            InnerHexComponentColor = "red";
+            ComponentColor = "red";
         StateHasChanged();
     }
 
-    #region SIGNALR 
+    #region SIGNALR
     #endregion
 
     protected override void OnInitialized()
     {
-        var s = 3;
+        var s = 1;
 
         hexSizeConfig = GlobalSettings.HexSizeConfigurations[s];
-        HexInnerComponentHeight = hexSizeConfig.InnerPartHeight + "px";
-        HexInnerComponentWidth = hexSizeConfig.InnerPartWidth + "px";
         HexWidth = hexSizeConfig.Width + "px";
         HexHeight = hexSizeConfig.Height + "px";
+        InnerComponentHeight = hexSizeConfig.InnerPartHeight + "px";
+        InnerComponentWidth = hexSizeConfig.InnerPartWidth + "px";
     }
 
     private string GetId()
     {
-        return TopCoord + "_" + LeftCoord;
+        return LeftCoord + "_" + TopCoord;
     }
 
-    private string GetText()
+    private MarkupString Text()
     {
-
         StringBuilder sb = new StringBuilder();
+        sb.AppendLine($"left:[{LeftCoord}],top[{TopCoord}]");
         foreach (var component in Components)
         {
             sb.AppendLine($"{component.DisplayText()}");
         }
 
-
-        return sb.ToString();
-
+        return  new MarkupString(sb.ToString());
     }
 
     protected override async Task OnInitializedAsync()
@@ -120,8 +179,8 @@
 
     private void Click()
     {
-        ChangeColor();
-        //Board.Click(GetId());
+        //ChangeColor();
+        Board.Click(GetId());
     }
 
     public async ValueTask DisposeAsync()

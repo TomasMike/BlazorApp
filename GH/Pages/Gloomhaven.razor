@@ -8,41 +8,107 @@
 
 @implements IAsyncDisposable
 @inject NavigationManager NavigationManager
+@*<div style="position:relative">
 
-
-<div>
-    <div class="hexGrid">
-        @{
-          
-
-        for (int i = 0; i < 1; i++)
+    @{
+        for (int i = 0; i < 4; i++)
         {
-            for (int j = 0; j < 1; j++)
+            for (int j = 0; j < 4; j++)
             {
                 <Hex LeftCoord="j" TopCoord="i" Board="this"></Hex>
             }
         }
-        }
-
-    </div>
-    <div id="sidePanel">
-        <button class="btn btn-primary" @onclick="Start">start</button>
-        <button class="btn btn-primary" @onclick="Test">test</button>
-        <button class="btn btn-primary" @onclick="ToggleMoveState">Move</button>
-        <ul id="messagesList">
-            @foreach (var message in messages)
-            {
-                <li>@message</li>
-            }
-        </ul>
-    </div>
+    }
+    </div>*@
+<div class="gameBoard">
+    <table>
+        <tr >
+            <td style="width:80%;height:80%">
+                <div style="position: relative; margin-top: 30px; position: relative; height:100%;">
+                    @{
+                        for (int i = 0; i < 4; i++)
+                        {
+                            for (int j = 0; j < 4; j++)
+                            {
+                                <Hex LeftCoord="j" TopCoord="i" Board="this"></Hex>
+                            }
+                        }
+                    }
+                </div>
+            </td>
+            <td>
+                <input @bind="Size" />
+                <button @onclick="Test">change size</button>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+        </tr>
+    </table>
 </div>
+
+
+@*<div class="a">
+        <div class="b" style="position:relative;height:50px;width:50px;background:red">
+            <div class="c" style="position: absolute; height: 50px; width: 50px; background: green; top: 10px; left: 10px">
+                <div class="d" style="position: relative; height: 50px; width: 50px; background: blue; top: 10px; left: 10px ">
+                    <div style="position:absolute;width:52px;height:30px;background:red;transform: rotate(90deg)"></div>
+                    <div style="position:absolute;width:52px;height:30px;background:red;transform: rotate(30deg)"></div>
+                    <div style="position:absolute;width:52px;height:30px;background:red;transform: rotate(-30deg)"></div>
+                </div>
+            </div>
+            <div class="c" style="position: absolute; height: 50px; width: 50px; background: green; top: 100px; left: 100px">
+                <div class="d" style="position: relative; height: 50px; width: 50px; background: blue; top: 10px; left: 10px ">
+                    <div style="position:absolute;width:52px;height:30px;background:red;transform: rotate(90deg)"></div>
+                    <div style="position:absolute;width:52px;height:30px;background:red;transform: rotate(30deg)"></div>
+                    <div style="position:absolute;width:52px;height:30px;background:red;transform: rotate(-30deg)"></div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+
+@*<table>
+        <tr>
+            <td style="width:80%;">
+                <div class="hexGrid">
+                    @{
+                        for (int i = 0; i < 1; i++)
+                        {
+                            for (int j = 0; j < 2; j++)
+                            {
+                                <Hex LeftCoord="j" TopCoord="i" Board="this"></Hex>
+                            }
+                        }
+                    }
+                </div>
+            </td>
+            <td>
+                <div id="sidePanel">
+                    <button class="btn btn-primary" @onclick="Start">start</button>
+                    <button class="btn btn-primary" @onclick="ToggleMoveState">Move</button>
+
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <ul id="messagesList">
+                    @foreach (var message in messages)
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            </td>
+        </tr>
+    </table>*@
+
 @code {
     private HubConnection hubConnection;
     private List<string> messages = new List<string>();
     public List<Hex> Hexes = new List<Hex>();
 
-
+    private string Size;
 
     private void StartGame()
     {
@@ -52,7 +118,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        #region SIGNALR 
+        #region SIGNALR
 
 
         hubConnection = new HubConnectionBuilder()
@@ -69,11 +135,23 @@
 
         hubConnection.On<Character, int, int>("SpawnCharacter", (obj, row, col) =>
         {
+            var h = this.GetHexByCoords(row, col);
+            if (h != null)
+                h.Components.Add(obj);
+            else
+                throw new Exception($"hex on row[{row}],col:[{col}] doesnt exist");
             messages.Add($"spawned character {obj} on hex [{row},{col}]");
+
             StateHasChanged();
         });
         hubConnection.On<TerrainComponent, int, int>("SpawnTerrainComponent", (obj, row, col) =>
         {
+            var h = this.GetHexByCoords(row, col);
+            if (h != null)
+                h.Components.Add(obj);
+            else
+                throw new Exception($"hex on row[{row}],col:[{col}] doesnt exist");
+
             messages.Add($"spawned terrain tile {obj} on hex [{row},{col}]");
 
             StateHasChanged();
@@ -93,28 +171,36 @@
 
     public async Task Start()
     {
-        Hexes.FirstOrDefault()?.Components.Add(new Character() { CharacterType = CharacterType.Mindthief });
-        StateHasChanged();
+        await hubConnection.SendAsync("StartClicked");
+        //Hexes.FirstOrDefault()?.Components.Add(new Character() { CharacterType = CharacterType.Mindthief });
+        //StateHasChanged();
         //await hubConnection.SendAsync("StartClicked");
     }
 
     public async Task Test()
     {
-        Hexes.FirstOrDefault().ChangeColor();
+        GlobalSettings.Size = int.Parse(Size);
+        StateHasChanged();
     }
 
     public bool IsConnected =>
-hubConnection.State == HubConnectionState.Connected;
-        
+        hubConnection.State == HubConnectionState.Connected;
+
     public async ValueTask DisposeAsync()
     {
-        if(hubConnection != null)
+        if (hubConnection != null)
             await hubConnection.DisposeAsync();
     }
 
-    void ToggleMoveState()
+    public async Task ToggleMoveState()
     {
+        await hubConnection.SendAsync("ToggleMoveState");
+    }
 
+    private string GetHexGridSize()
+    {
+        return "";
+        //Hexes.Distinct(h => )
     }
 
 }
