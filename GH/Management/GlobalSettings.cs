@@ -9,12 +9,14 @@ namespace BlazorApp.GH
 {
     public static class GlobalSettings
     {
-        public static HexOrientation HexOrientationConfiguration;
 
         public static string q = "";
         public static string q1 => "";
 
-        public static int Size = 30;
+        public static int Size = 70;
+        public static string DefaultHexColor = "teal";
+        public static string ClickableOptionHexColor = "blue";
+        public static string OriginHexColor = "green";
 
         public static Dictionary<int, HexSizeConfig> HexSizeConfigurations = new Dictionary<int, HexSizeConfig>
         {
@@ -36,13 +38,5 @@ namespace BlazorApp.GH
                 }
             },
         };
-    }
-
-    public static class HelperStuff
-    {
-        public static Hex GetHexByCoords(this Gloomhaven gh, int top, int left)
-        {
-            return gh.Hexes.FirstOrDefault(h => h.TopCoord == top && h.LeftCoord == left);
-        }
     }
 }

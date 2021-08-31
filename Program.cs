@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BlazorApp.GH;
+using BlazorApp.GH.Management;
 using BlazorApp.Hubs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
@@ -17,7 +17,7 @@ namespace BlazorApp
         public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
-            GHGameManager.ihub = (IHubContext<Hub<IGloomhavenHubClient>>)host.Services.GetService(typeof(IHubContext<Hub<IGloomhavenHubClient>>));
+            GHGameManager.ihub = (IHubContext<GloomhavenHub>)host.Services.GetService(typeof(IHubContext<GloomhavenHub>));
             host.Run();
         }
 

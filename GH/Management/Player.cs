@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace BlazorApp.GH
 {
-
     public class Player
     {
+        public Guid FigureId;
         public string Name;
+        public int PlayerNumber;
     }
 }

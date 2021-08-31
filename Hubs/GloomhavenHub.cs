@@ -1,8 +1,10 @@
-﻿using BlazorApp.GH;
+﻿using BlazorApp.GH.Components;
+using BlazorApp.GH.Management;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,15 +25,15 @@ namespace BlazorApp.Hubs
             //await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
-        public async Task SpawnObject(IGameComponent objectToSpawn, int row, int col)
+        public void SpawnObject(IGameComponent objectToSpawn, int row, int col)
         {
             switch (objectToSpawn)
             {
                 case Character c:
-                    await Clients.All.SendAsync("SpawnCharacter", c, row, col);
+                    Clients.All.SendAsync("SpawnCharacter", JsonConvert.SerializeObject(c), row, col);
                     break;
                 case TerrainComponent t:
-                    await Clients.All.SendAsync("SpawnTerrainComponent", t, row, col);
+                    Clients.All.SendAsync("SpawnTerrainComponent", JsonConvert.SerializeObject(t), row, col);
                     break;
                 default:
                     break;
@@ -39,10 +41,20 @@ namespace BlazorApp.Hubs
         }
 
 
-        public async Task StartClicked()
+        public async Task StartClicked(int levelToLoad)
         {
-            await SpawnObject(new Character(), 0, 0);
-            await SpawnObject(new TerrainComponent() { TerrainType = TerrainType.Obstacle}, 1, 1);
+           var objectsToInit = GHGameManager.StartLevel(levelToLoad);
+
+            foreach (var item in objectsToInit)
+            {
+               SpawnObject(item.Component, item.TopCord, item.LeftCord);
+            }
+          
+        }
+
+        public async Task ToggleMoveState(int playerNumber, int moveDistance)
+        {
+            GHGameManager.ToggleMoveState(playerNumber, moveDistance);
         }
     }
 

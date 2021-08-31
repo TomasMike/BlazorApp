@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BlazorApp.GH
+namespace BlazorApp.GH.Components
 {
 
     public class ComponentBase

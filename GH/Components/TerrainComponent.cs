@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using BlazorApp.GH.Utilities;
 
-namespace BlazorApp.GH
+namespace BlazorApp.GH.Components
 {
 
     public class TerrainComponent : ComponentBase, IGameComponent

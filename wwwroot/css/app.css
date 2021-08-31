@@ -66,13 +66,13 @@ div.flat .h3 {
     transform: rotate(-30deg);
 }
 
-/*
-p.hexText{
-    top:10px;
-    left:10px;
-    z-index:2;
-    position:absolute;
-}*/
+
+.hexText {
+    z-index: 2;
+    position: absolute;
+    top: 40%;
+    left: 15%;
+}
 
 
 
