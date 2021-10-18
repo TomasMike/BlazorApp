@@ -8,19 +8,16 @@ using BlazorApp.GH.Components;
 
 namespace BlazorApp.GH
 {
-
-
-
     public class SpawnObjectPart
     {
-        public SpawnObjectPart(IGameComponent component, int top, int left)
+        public SpawnObjectPart(GameComponentBase component, int top, int left)
         {
             Component = component;
             TopCord = top;
             LeftCord = left;
         }
 
-        public IGameComponent Component;
+        public GameComponentBase Component;
         public int TopCord;
         public int LeftCord;
     }

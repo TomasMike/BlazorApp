@@ -14,8 +14,6 @@ namespace BlazorApp.GH
 
     public static class Helper
     {
-      
-
         /// <summary>
         /// returns hex, null if it doesnt exist
         /// </summary>
@@ -31,9 +29,9 @@ namespace BlazorApp.GH
         }
 
 
-        public static List<IGameComponent> GetAllComponentsInPlay()
+        public static List<GameComponentBase> GetAllComponentsInPlay()
         {
-            var retVal = new List<IGameComponent>();
+            var retVal = new List<GameComponentBase>();
             foreach (var hex in GHGameManager.GloomhavenHexes)
             {
                 retVal.AddRange(hex.Components);

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace BlazorApp.GH.Components
 {
 
-    public class Character : ComponentBase, IGameComponent
+    public class Character : GameComponentBase
     {
         public CharacterType CharacterType;
         public int PlayerNumber;
@@ -15,7 +15,7 @@ namespace BlazorApp.GH.Components
             CharacterType = t;
         }
 
-        public string DisplayText()
+        public override string DisplayText()
         {
             return CharacterType.ToString();
         }

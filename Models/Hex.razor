@@ -23,16 +23,25 @@
 <div id="@GetId()" class="hexagon flat" style="top: @GetTop(); left: @GetLeft();height:@GetElementHeightText;width:@GetElementWidthText">
     <div class="hexText"> @Text()</div>
     <div style="position: relative;">
-        <div class="h1" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
-        <div class="h2" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
-        <div class="h3" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div @onclick="Click" class="h1" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div @onclick="Click" class="h2" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div @onclick="Click" class="h3" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
     </div>
 </div>
 
 @code{
 
-    public Hex() { }
+    private Gloomhaven _board;
+    private HubConnection hubConnection;
+    private HexSizeConfig hexSizeConfig;
+    private string HexHeight;
+    private string HexWidth;
+    private string InnerComponentWidth;
+    private string InnerComponentHeight;
+    private string InnerComponentTop => (Math.Round(GlobalSettings.Size * 0.4, 0)) + "px";
+    private string InnerComponentLeft => (Math.Round(GlobalSettings.Size * 0.15, 0)) + "px";
 
+    public Hex() { }
     public Hex(int column, int row)
     {
         Column = column;
@@ -41,7 +50,6 @@
         StateHasChanged();
     }
 
-    private Gloomhaven _board;
     [Parameter]
     public Gloomhaven Board
     {
@@ -59,22 +67,15 @@
 
     [Parameter]
     public int Row { get; set; }
+
     [Parameter]
     public int Column { get; set; }
 
+    public List<GameComponentBase> Components = new List<GameComponentBase>();
+    public string ComponentColor = GlobalSettings.DefaultHexColor.ToString().ToLower();
 
-    public List<IGameComponent> Components = new List<IGameComponent>();
+    #region size,position of hex
 
-    public string ComponentColor = GlobalSettings.DefaultHexColor;
-
-    private HubConnection hubConnection;
-    private HexSizeConfig hexSizeConfig;
-    private string HexHeight;
-    private string HexWidth;
-    private string InnerComponentWidth;
-    private string InnerComponentHeight;
-    private string InnerComponentTop => (Math.Round(GlobalSettings.Size * 0.4, 0)) + "px";
-    private string InnerComponentLeft => (Math.Round(GlobalSettings.Size * 0.15, 0)) + "px";
 
     // zatial je hex orientation stale flat
     private double GetInnerElementHeight()
@@ -121,24 +122,16 @@
 
         return $"{value}px";
     }
+    #endregion
 
 
-    public void ChangeColor()
+    public void ChangeColor(HexColor color)
     {
-        //Random r = new Random();
-        //ComponentColor = $"rgb({r.Next(0, 256)},{r.Next(0, 256)},{r.Next(0, 256)})";
-        if (ComponentColor == "red")
-            ComponentColor = "green";
-        else if (ComponentColor == "green")
-            ComponentColor = "blue";
-        else
-            ComponentColor = "red";
+        ComponentColor = color.ToString().ToLower();
         StateHasChanged();
     }
 
     #region SIGNALR
-    #endregion
-
     protected override void OnInitialized()
     {
         var s = 1;
@@ -149,6 +142,9 @@
         InnerComponentHeight = hexSizeConfig.InnerPartHeight + "px";
         InnerComponentWidth = hexSizeConfig.InnerPartWidth + "px";
     }
+    #endregion
+
+
 
     private string GetId()
     {
@@ -167,11 +163,6 @@
         return new MarkupString(sb.ToString());
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-
-
-    }
 
     public string Test(string s)
     {
@@ -180,7 +171,6 @@
 
     private void Click()
     {
-        //ChangeColor();
         Board.Click(GetId());
     }
 

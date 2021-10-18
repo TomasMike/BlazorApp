@@ -4,11 +4,11 @@ using BlazorApp.GH.Utilities;
 namespace BlazorApp.GH.Components
 {
 
-    public class TerrainComponent : ComponentBase, IGameComponent
+    public class TerrainComponent : GameComponentBase
     {
         public TerrainType TerrainType;
 
-        public string DisplayText()
+        public override string DisplayText()
         {
             return TerrainType.ToString();
         }

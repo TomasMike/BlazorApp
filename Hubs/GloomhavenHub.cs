@@ -25,7 +25,7 @@ namespace BlazorApp.Hubs
             //await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
-        public void SpawnObject(IGameComponent objectToSpawn, int row, int col)
+        public void SpawnObject(GameComponentBase objectToSpawn, int row, int col)
         {
             switch (objectToSpawn)
             {
@@ -57,14 +57,4 @@ namespace BlazorApp.Hubs
             GHGameManager.ToggleMoveState(playerNumber, moveDistance);
         }
     }
-
-    public interface IGloomhavenHubClient
-    {
-        Task SpawnGameComponent(IGameComponent objectToSpawn, int row, int col);
-
-        Task SendMessage(string user, string message);
-
-        //Task HexClicked(string hexId);
-    }
-
 }

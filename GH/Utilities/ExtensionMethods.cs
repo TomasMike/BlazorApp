@@ -23,12 +23,12 @@ namespace BlazorApp.GH.Utilities
             return gh.Hexes.FirstOrDefault(h => h.Column == column && h.Row == row);
         }
 
-        public static Hex GetCurrentLocationHex(this IGameComponent c)
+        public static Hex GetCurrentLocationHex(this GameComponentBase c)
         {
             return GHGameManager.GloomhavenHexes.First(_ => _.Components.Contains(c));
         }
 
-        public static List<Hex> GetCellsInRange(this Hex h, int column, int row, int range)
+        public static List<Hex> GetHexesInRange(this Hex h, int range)
         {
             var retVal = new List<Hex>();
 

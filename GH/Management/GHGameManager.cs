@@ -6,6 +6,7 @@ using BlazorApp.GH.Pages;
 using BlazorApp.GH.Utilities;
 using BlazorApp.GH.Components;
 using BlazorApp.Models;
+using System;
 
 namespace BlazorApp.GH.Management
 {
@@ -44,10 +45,20 @@ namespace BlazorApp.GH.Management
 
         public static void ToggleMoveState(int playerNumber, int moveDistance)
         {
-            //var movingPlayer = 
+            var p = Helper.GetPlayerByPlayerNumber(playerNumber);
+
+            if (p == null)
+                throw new Exception("taky hrac nie je v hre");
+
+
+            var currentHex = Helper.GetAllComponentsInPlay().First(_ => _.Id == p.FigureId).GetCurrentLocationHex();
+            var hexes = currentHex.GetHexesInRange(moveDistance);
+            hexes.ForEach(_ => _.ChangeColor(GlobalSettings.ClickableOptionHexColor));
+
+            //Helper.GetAllComponentsInPlay().FirstOrDefault(_ => _.)
             //movingPlayer.
 
-            
+
         }
     }
 

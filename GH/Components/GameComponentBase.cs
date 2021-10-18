@@ -4,9 +4,12 @@ using System.Collections.Generic;
 namespace BlazorApp.GH.Components
 {
 
-    public class ComponentBase
+    public abstract class GameComponentBase 
     {
         public readonly Guid Id = Guid.NewGuid();
+
+        public abstract string DisplayText();
+        
     }
 
 

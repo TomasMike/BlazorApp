@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace BlazorApp.GH.Utilities
 {
-
     public enum TerrainType
     {
         Obstacle,
@@ -36,6 +35,11 @@ namespace BlazorApp.GH.Utilities
         Move,
     }
 
-
+    public enum HexColor
+    {
+        Blue,
+        Green,
+        Teal
+    }
 
 }
