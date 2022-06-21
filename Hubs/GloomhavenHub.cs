@@ -1,5 +1,7 @@
-﻿using BlazorApp.GH.Components;
+﻿using BlazorApp.GH;
+using BlazorApp.GH.Components;
 using BlazorApp.GH.Management;
+using BlazorApp.GH.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
@@ -52,9 +54,32 @@ namespace BlazorApp.Hubs
           
         }
 
-        public async Task ToggleMoveState(int playerNumber, int moveDistance)
+        public async Task ToggleMoveState(int playerNumber, int moveDistance,GameBoardState newState)
         {
-            GHGameManager.ToggleMoveState(playerNumber, moveDistance);
+            if (newState == GameBoardState.Move)
+            {
+                var r = GHGameManager.ToggleMoveStateOn(playerNumber, moveDistance);
+                foreach (var hex  in r.Item1)
+                {
+                    Clients.All.SendAsync("ChangeColor", hex.Column, hex.Row, (int)GlobalSettings.ClickableOptionHexColor);
+                }
+                
+
+            }
+            else
+            {
+                foreach (var hex in GHGameManager.GloomhavenHexes)
+                { 
+                    Clients.All.SendAsync("ChangeColor", hex.Column, hex.Row, (int)GlobalSettings.DefaultHexColor);
+                }
+            }
+
+        }
+
+        public async void ChangeColor(int hexCol,int hexRow, HexColor color)
+        {
+            
+
         }
     }
 }

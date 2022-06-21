@@ -6,7 +6,17 @@ namespace BlazorApp.GH.Components
 
     public abstract class GameComponentBase 
     {
-        public readonly Guid Id = Guid.NewGuid();
+        public Guid Id { get; set; }
+
+        public GameComponentBase()
+        {
+            Id = Guid.NewGuid(); 
+        }
+
+        public GameComponentBase(Guid id)
+        {
+            Id = id;
+        }
 
         public abstract string DisplayText();
         

@@ -154,7 +154,7 @@
     private MarkupString Text()
     {
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"L:[{Column}],T:[{Row}]");
+        sb.AppendLine($"C:[{Column}],R:[{Row}]");
         foreach (var component in Components)
         {
             sb.AppendLine($"{component.DisplayText()}");

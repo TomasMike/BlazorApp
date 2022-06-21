@@ -66,15 +66,26 @@ namespace BlazorApp.GH.Utilities
         {
             //TODO dependent on the hex orientation
             // odd vertical
+
+            var isEvenColumn = h.Column.IsEven();
+
             return new List<Hex>
             {
-                Helper.GetHexByCoord(h.Column    , h.Row - 1),
-                Helper.GetHexByCoord(h.Column    , h.Row + 1),
-                Helper.GetHexByCoord(h.Column - 1, h.Row    ),
-                Helper.GetHexByCoord(h.Column + 1, h.Row    ),
-                Helper.GetHexByCoord(h.Column + 1, h.Row + 1),
-                Helper.GetHexByCoord(h.Column - 1, h.Row + 1)
+                Helper.GetHexByCoord(h.Column    , h.Row - 1), //above
+                Helper.GetHexByCoord(h.Column    , h.Row + 1), //below
+
+                Helper.GetHexByCoord(h.Column - 1, isEvenColumn ? h.Row - 1 : h.Row    ), //up left
+                Helper.GetHexByCoord(h.Column - 1, isEvenColumn ? h.Row     : h.Row + 1), //down left
+
+                Helper.GetHexByCoord(h.Column + 1, isEvenColumn ? h.Row - 1 : h.Row    ), //up right
+                Helper.GetHexByCoord(h.Column + 1, isEvenColumn ? h.Row     : h.Row + 1)  //down right
             }.Where(_ => _ != null).ToList();
         }
+
+        public static bool IsEven(this int i)
+        {
+            return i % 2 == 0;
+        }
+
     }
 }

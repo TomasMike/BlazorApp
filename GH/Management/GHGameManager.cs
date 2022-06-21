@@ -43,7 +43,7 @@ namespace BlazorApp.GH.Management
             return retVal;
         }
 
-        public static void ToggleMoveState(int playerNumber, int moveDistance)
+        public static (List<Hex>,HexColor) ToggleMoveStateOn(int playerNumber, int moveDistance)
         {
             var p = Helper.GetPlayerByPlayerNumber(playerNumber);
 
@@ -53,8 +53,8 @@ namespace BlazorApp.GH.Management
 
             var currentHex = Helper.GetAllComponentsInPlay().First(_ => _.Id == p.FigureId).GetCurrentLocationHex();
             var hexes = currentHex.GetHexesInRange(moveDistance);
-            hexes.ForEach(_ => _.ChangeColor(GlobalSettings.ClickableOptionHexColor));
-
+            //hexes.ForEach(_ =>    _.ChangeColor(GlobalSettings.ClickableOptionHexColor));
+            return (hexes, GlobalSettings.ClickableOptionHexColor);
             //Helper.GetAllComponentsInPlay().FirstOrDefault(_ => _.)
             //movingPlayer.
 
