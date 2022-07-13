@@ -21,7 +21,7 @@
 
 
 <div id="@GetId()" class="hexagon flat" style="top: @GetTop(); left: @GetLeft();height:@GetElementHeightText;width:@GetElementWidthText">
-    <div class="hexText"> @Text()</div>
+    <div class="hexText" @onclick="Click"> @Text() </div>
     <div style="position: relative;">
         <div @onclick="Click" class="h1" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
         <div @onclick="Click" class="h2" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
@@ -73,6 +73,10 @@
 
     public List<GameComponentBase> Components = new List<GameComponentBase>();
     public string ComponentColor = GlobalSettings.DefaultHexColor.ToString().ToLower();
+
+
+    public event EventHandler<Hex> HexClicked;
+    public void ClearClickedEvent() { HexClicked = null; }
 
     #region size,position of hex
 
@@ -159,7 +163,7 @@
         {
             sb.AppendLine($"{component.DisplayText()}");
         }
-
+        sb.Append("<p style=\"color:red\">test</p>");
         return new MarkupString(sb.ToString());
     }
 
@@ -171,7 +175,8 @@
 
     private void Click()
     {
-        Board.Click(GetId());
+        HexClicked?.Invoke(this,this);
+       // Board.Click(GetId());
     }
 
     public async ValueTask DisposeAsync()

@@ -17,7 +17,7 @@ namespace BlazorApp.GH.Utilities
                 1,
                 new()
                 {
-                    new SpawnObjectPart(new Character(CharacterType.Spellweaver) { PlayerNumber = 1 }, 0, 0),
+                    new SpawnObjectPart(new CharacterComponent(CharacterType.Spellweaver) { PlayerNumber = 1 }, 0, 0),
                     new SpawnObjectPart(new TerrainComponent() { TerrainType = TerrainType.Obstacle }, 1, 1)
                 }
             }

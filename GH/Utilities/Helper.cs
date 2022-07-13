@@ -49,5 +49,25 @@ namespace BlazorApp.GH
 
             return retVal;
         }
+
+        public static Hex GetHexByPlayer(Player player)
+        {
+            return GetAllComponentsInPlay().First(_ => _.Id == player.FigureId).GetCurrentLocationHex();
+        }
+
+        public static List<Hex> GetPossibleMoveHexes(Player player, int moveDistance)
+        {
+            return GetHexByPlayer(player).GetHexesInRange(moveDistance);
+        }
+
+        public static Hex GetHexByComponent(GameComponentBase component)
+        {
+            return GHGameManager.GloomhavenHexes.FirstOrDefault(h => h.Components.Contains(component));
+        }
+
+        public static CharacterComponent GetCharacterComponent(Player player)
+        {
+            return GetHexByPlayer(player).Components.First(c => c is CharacterComponent) as CharacterComponent;
+        }
     }
 }

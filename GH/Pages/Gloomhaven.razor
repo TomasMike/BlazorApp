@@ -42,7 +42,7 @@
             <td>
                 <table>
                     <tr>
-                        <td>  <input @bind="Size" />   <button class="btn btn-primary" @onclick="Test">change size</button></td>
+                        <td>  <input @bind="Size" />   <button class="btn btn-primary" @onclick="ChangeSize">change size</button></td>
                     </tr>
                     <tr>
                         <td>  <input @bind="levelPickValueRef" type="text" />   <button class="btn btn-primary" @onclick="Start">start</button></td>
@@ -105,8 +105,8 @@
 
         hubConnection.On<string, int, int>("SpawnCharacter", (json, row, col) =>
         {
-            var h = this.GetHexByCoords( col, row);
-            var obj = JsonConvert.DeserializeObject<Character>(json);
+            var h = this.GetHexByCoords(col, row);
+            var obj = JsonConvert.DeserializeObject<CharacterComponent>(json);
             if (h != null)
                 h.Components.Add(obj);
             else
@@ -118,7 +118,7 @@
 
         hubConnection.On<int, int, int>("ChangeColor", (hexCol, hexRow, color) =>
         {
-            var h = this.GetHexByCoords(hexCol,hexRow );
+            var h = this.GetHexByCoords(hexCol, hexRow);
             h.ChangeColor((HexColor)color);
             StateHasChanged();
         });
@@ -137,10 +137,20 @@
             StateHasChanged();
         });
 
+
+
+
+
+
+
+
         await hubConnection.StartAsync();
 
 
-        while(hubConnection.State != HubConnectionState.Connected)
+
+
+
+        while (hubConnection.State != HubConnectionState.Connected)
         {
             await Task.Delay(100);
             Console.WriteLine($"hubConnection is {hubConnection.State}");
@@ -153,8 +163,22 @@
     public async Task Send() =>
  await hubConnection.SendAsync("SendMessage", "", "");
 
-    public async Task Click(string hexId) =>
+    public async Task Click(string hexId)
+    {
+        switch (GHGameManager.GameState.GBState)
+        {
+            case GameBoardState.Move:
+
+                break;
+            case GameBoardState.Default:
+            default:
+                break;
+        }
+
+        Console.WriteLine($"clicky");
+
         await hubConnection.SendAsync("HexClicked", hexId);
+    }
 
     public async Task Start()
     {
@@ -164,7 +188,7 @@
         //await hubConnection.SendAsync("StartClicked");
     }
 
-    public async Task Test()
+    public async Task ChangeSize()
     {
         GlobalSettings.Size = int.Parse(Size);
         StateHasChanged();
@@ -182,10 +206,35 @@
     public async Task ToggleMoveState()
     {
         GHGameManager.GameState.GBState = GHGameManager.GameState.GBState == GameBoardState.Move ? GameBoardState.Default : GameBoardState.Move;
-        await hubConnection.SendAsync("ToggleMoveState", 1, 1, GHGameManager.GameState.GBState);
+
+        if (GHGameManager.GameState.GBState == GameBoardState.Move)
+        {
+            Helper.GetHexByPlayer(GHGameManager.GameState.ActivePlayer).ChangeColor(GlobalSettings.OriginHexColor);
+
+            var validOptionHexes = Helper.GetPossibleMoveHexes(GHGameManager.GameState.ActivePlayer, 1);
+            foreach (var h in validOptionHexes)
+            {
+                h.HexClicked += ClickToMove;
+                h.ChangeColor(GlobalSettings.ClickableOptionHexColor);
+            }
+        }
+        else
+        {
+            foreach (var h in Hexes)
+            {
+                h.HexClicked -= ClickToMove;
+                h.ChangeColor(GlobalSettings.DefaultHexColor);
+            }
+        }
     }
 
-
+    public void ClickToMove(object o, Hex h)
+    {
+        GHGameManager.Move(Helper.GetCharacterComponent(GHGameManager.GameState.ActivePlayer),h);
+        ToggleMoveState();
+        StateHasChanged();
+        Console.WriteLine($"snaha o pohyb,[{o}],[{h}]");
+    }
 
     private string GetHexGridSize()
     {

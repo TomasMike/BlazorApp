@@ -24,14 +24,14 @@ namespace BlazorApp.Hubs
         public async Task HexClicked(string hexId)
         {
             var x = hexId;
-            //await Clients.All.SendAsync("ReceiveMessage", user, message);
+            await Clients.All.SendAsync("ReceiveMessage", "someone", $"clicked on hex [{hexId}]");
         }
 
         public void SpawnObject(GameComponentBase objectToSpawn, int row, int col)
         {
             switch (objectToSpawn)
             {
-                case Character c:
+                case CharacterComponent c:
                     Clients.All.SendAsync("SpawnCharacter", JsonConvert.SerializeObject(c), row, col);
                     break;
                 case TerrainComponent t:
@@ -51,30 +51,29 @@ namespace BlazorApp.Hubs
             {
                SpawnObject(item.Component, item.TopCord, item.LeftCord);
             }
-          
-        }
 
-        public async Task ToggleMoveState(int playerNumber, int moveDistance,GameBoardState newState)
-        {
-            if (newState == GameBoardState.Move)
-            {
-                var r = GHGameManager.ToggleMoveStateOn(playerNumber, moveDistance);
-                foreach (var hex  in r.Item1)
-                {
-                    Clients.All.SendAsync("ChangeColor", hex.Column, hex.Row, (int)GlobalSettings.ClickableOptionHexColor);
-                }
-                
+            GHGameManager.GameState.ActivePlayer = GHGameManager.GameState.Players.First();
 
-            }
-            else
-            {
-                foreach (var hex in GHGameManager.GloomhavenHexes)
-                { 
-                    Clients.All.SendAsync("ChangeColor", hex.Column, hex.Row, (int)GlobalSettings.DefaultHexColor);
-                }
-            }
 
         }
+
+        //public async Task ToggleMoveState(int playerNumber, int moveDistance,GameBoardState newState)
+        //{
+        //    if (newState == GameBoardState.Move)
+        //    {
+        //        var r = GHGameManager.GetPossibleMoveHexes(playerNumber, moveDistance);
+        //        Clients.Caller.SendAsync("EnableMoveState", r);
+              
+        //    }
+        //    else
+        //    {
+        //        foreach (var hex in GHGameManager.GloomhavenHexes)
+        //        { 
+        //            Clients.All.SendAsync("ChangeColor", hex.Column, hex.Row, (int)GlobalSettings.DefaultHexColor);
+        //        }
+        //    }
+
+        //}
 
         public async void ChangeColor(int hexCol,int hexRow, HexColor color)
         {

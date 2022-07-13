@@ -5,12 +5,12 @@ using System.Collections.Generic;
 namespace BlazorApp.GH.Components
 {
 
-    public class Character : GameComponentBase
+    public class CharacterComponent : GameComponentBase
     {
         public CharacterType CharacterType;
         public int PlayerNumber;
 
-        public Character(CharacterType t)
+        public CharacterComponent(CharacterType t)
         {
             CharacterType = t;
         }

@@ -33,9 +33,9 @@ namespace BlazorApp.GH.Management
 
             foreach (var item in retVal)
             {
-                if (item.Component is Character)
+                if (item.Component is CharacterComponent)
                 {
-                    var c = item.Component as Character;
+                    var c = item.Component as CharacterComponent;
                     var p = GameState.Players.FirstOrDefault(_ => _.PlayerNumber == c.PlayerNumber);
                     p.FigureId = c.Id;
                 }
@@ -43,22 +43,12 @@ namespace BlazorApp.GH.Management
             return retVal;
         }
 
-        public static (List<Hex>,HexColor) ToggleMoveStateOn(int playerNumber, int moveDistance)
+        public static void Move(GameComponentBase component, Hex destinationHex)
         {
-            var p = Helper.GetPlayerByPlayerNumber(playerNumber);
+            var originHex = Helper.GetHexByComponent(component);
 
-            if (p == null)
-                throw new Exception("taky hrac nie je v hre");
-
-
-            var currentHex = Helper.GetAllComponentsInPlay().First(_ => _.Id == p.FigureId).GetCurrentLocationHex();
-            var hexes = currentHex.GetHexesInRange(moveDistance);
-            //hexes.ForEach(_ =>    _.ChangeColor(GlobalSettings.ClickableOptionHexColor));
-            return (hexes, GlobalSettings.ClickableOptionHexColor);
-            //Helper.GetAllComponentsInPlay().FirstOrDefault(_ => _.)
-            //movingPlayer.
-
-
+            originHex.Components.Remove(component);
+            destinationHex.Components.Add(component);
         }
     }
 
@@ -74,6 +64,8 @@ namespace BlazorApp.GH.Management
         public List<Player> Players;
 
         public GameBoardState GBState;
+
+        public Player ActivePlayer;
 
     }
 }
