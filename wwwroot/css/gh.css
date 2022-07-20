@@ -1,21 +1,4 @@
-﻿#clearingContainer {
-    position: relative;
-    width: 1000px;
-    height: 1000px;
-    background-image: url(../images/board.jpg);
-    background-repeat: no-repeat;
-    display: inline-block;
-    float: left;
-}
-
-.clearing {
-    border: 3px solid red;
-    width: 120px;
-    height: 120px;
-    position: absolute;
-    background-color: white;
-}
-
+﻿
 #sidePanel {
     display: inline-block;
     float: right;
@@ -73,6 +56,9 @@ div.flat .h3 {
     top: 40%;
     left: 15%;
 }
-
+/*
+.component{
+    background-color:
+}*/
 
 

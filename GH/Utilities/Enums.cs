@@ -35,11 +35,6 @@ namespace BlazorApp.GH.Utilities
         Move,
     }
 
-    public enum HexColor
-    {
-        Blue,
-        Green,
-        Teal
-    }
+
 
 }

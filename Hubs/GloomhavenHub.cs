@@ -75,10 +75,6 @@ namespace BlazorApp.Hubs
 
         //}
 
-        public async void ChangeColor(int hexCol,int hexRow, HexColor color)
-        {
-            
-
-        }
+       
     }
 }

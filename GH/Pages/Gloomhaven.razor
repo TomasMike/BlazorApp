@@ -116,12 +116,12 @@
             StateHasChanged();
         });
 
-        hubConnection.On<int, int, int>("ChangeColor", (hexCol, hexRow, color) =>
-        {
-            var h = this.GetHexByCoords(hexCol, hexRow);
-            h.ChangeColor((HexColor)color);
-            StateHasChanged();
-        });
+        //hubConnection.On<int, int, int>("ChangeColor", (hexCol, hexRow, color) =>
+        //{
+        //    var h = this.GetHexByCoords(hexCol, hexRow);
+        //    h.ChangeColor((HexColor)color);
+        //    StateHasChanged();
+        //});
 
         hubConnection.On<string, int, int>("SpawnTerrainComponent", (json, row, col) =>
         {
@@ -209,7 +209,7 @@
 
         if (GHGameManager.GameState.GBState == GameBoardState.Move)
         {
-            Helper.GetHexByPlayer(GHGameManager.GameState.ActivePlayer).ChangeColor(GlobalSettings.OriginHexColor);
+            Helper.GetHexByPlayer(GHGameManager.GameState.ActivePlayer).ChangeColor(GlobalSettings.ActionOriginHexColor);
 
             var validOptionHexes = Helper.GetPossibleMoveHexes(GHGameManager.GameState.ActivePlayer, 1);
             foreach (var h in validOptionHexes)
@@ -223,7 +223,7 @@
             foreach (var h in Hexes)
             {
                 h.HexClicked -= ClickToMove;
-                h.ChangeColor(GlobalSettings.DefaultHexColor);
+                h.ChangeColor(GlobalSettings.DefaultHexBackColor);
             }
         }
     }

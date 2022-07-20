@@ -23,9 +23,9 @@
 <div id="@GetId()" class="hexagon flat" style="top: @GetTop(); left: @GetLeft();height:@GetElementHeightText;width:@GetElementWidthText">
     <div class="hexText" @onclick="Click"> @Text() </div>
     <div style="position: relative;">
-        <div @onclick="Click" class="h1" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
-        <div @onclick="Click" class="h2" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
-        <div @onclick="Click" class="h3" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@ComponentColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div @onclick="Click" class="h1" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@HexBackColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div @onclick="Click" class="h2" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@HexBackColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
+        <div @onclick="Click" class="h3" style="width:@GetInnerElementWidthText;height:@GetInnerElementHeightText;background:@HexBackColor;top:@InnerComponentTop;left:@InnerComponentLeft"></div>
     </div>
 </div>
 
@@ -72,7 +72,7 @@
     public int Column { get; set; }
 
     public List<GameComponentBase> Components = new List<GameComponentBase>();
-    public string ComponentColor = GlobalSettings.DefaultHexColor.ToString().ToLower();
+    public string HexBackColor = GlobalSettings.DefaultHexBackColor;
 
 
     public event EventHandler<Hex> HexClicked;
@@ -129,9 +129,9 @@
     #endregion
 
 
-    public void ChangeColor(HexColor color)
+    public void ChangeColor(string color)
     {
-        ComponentColor = color.ToString().ToLower();
+        HexBackColor = color;
         StateHasChanged();
     }
 
@@ -161,7 +161,7 @@
         sb.AppendLine($"C:[{Column}],R:[{Row}]");
         foreach (var component in Components)
         {
-            sb.AppendLine($"{component.DisplayText()}");
+            sb.AppendLine($"<p style=\"color:{component.GetComponentColors().TextColor};background-color:{component.GetComponentColors().BackColor}\">{component.DisplayText()}");
         }
         sb.Append("<p style=\"color:red\">test</p>");
         return new MarkupString(sb.ToString());
@@ -176,7 +176,7 @@
     private void Click()
     {
         HexClicked?.Invoke(this,this);
-       // Board.Click(GetId());
+        // Board.Click(GetId());
     }
 
     public async ValueTask DisposeAsync()
