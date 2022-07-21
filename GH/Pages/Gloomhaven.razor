@@ -29,11 +29,12 @@
             <td style="width:80%;height:80%">
                 <div style="position: relative; margin-top: 30px; position: relative; height:100%;">
                     @{
+                        short id = 0;
                         for (int i = 0; i < 4; i++)
                         {
                             for (int j = 0; j < 4; j++)
                             {
-                                <Hex Column="j" Row="i" Board="this"></Hex>
+                                <Hex Column="j" Row="i" Board="this" Id="id++"></Hex>
                             }
                         }
                     }
@@ -137,6 +138,10 @@
             StateHasChanged();
         });
 
+        hubConnection.On("UpdateYourselves",() =>
+        {
+
+        });
 
 
 
@@ -160,8 +165,10 @@
         #endregion
     }
 
-    public async Task Send() =>
- await hubConnection.SendAsync("SendMessage", "", "");
+    public async Task Send()
+    {
+        await hubConnection.SendAsync("SendMessage", "", "");
+    }
 
     public async Task Click(string hexId)
     {
@@ -230,7 +237,11 @@
 
     public void ClickToMove(object o, Hex h)
     {
-        GHGameManager.Move(Helper.GetCharacterComponent(GHGameManager.GameState.ActivePlayer),h);
+
+
+
+        hubConnection.InvokeAsync<int>("Move", GHGameManager.GameState.ActivePlayer.PlayerNumber, h.Id);
+
         ToggleMoveState();
         StateHasChanged();
         Console.WriteLine($"snaha o pohyb,[{o}],[{h}]");

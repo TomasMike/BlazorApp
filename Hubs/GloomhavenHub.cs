@@ -2,6 +2,7 @@
 using BlazorApp.GH.Components;
 using BlazorApp.GH.Management;
 using BlazorApp.GH.Utilities;
+using BlazorApp.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
@@ -18,7 +19,7 @@ namespace BlazorApp.Hubs
     {
         public async Task SendMessage(string user, string message)
         {
-           // await Clients.All.SendMessage(user, message);
+            // await Clients.All.SendMessage(user, message);
         }
 
         public async Task HexClicked(string hexId)
@@ -45,16 +46,22 @@ namespace BlazorApp.Hubs
 
         public async Task StartClicked(int levelToLoad)
         {
-           var objectsToInit = GHGameManager.StartLevel(levelToLoad);
+            var objectsToInit = GHGameManager.StartLevel(levelToLoad);
 
             foreach (var item in objectsToInit)
             {
-               SpawnObject(item.Component, item.TopCord, item.LeftCord);
+                SpawnObject(item.Component, item.TopCord, item.LeftCord);
             }
 
             GHGameManager.GameState.ActivePlayer = GHGameManager.GameState.Players.First();
 
 
+        }
+
+        public async Task Move(int playerNumber, short hexId)
+        {
+            GHGameManager.Move(Helper.GetCharacterComponent(Helper.GetPlayerByPlayerNumber(playerNumber)), Helper.GetHexById(hexId));
+            await Clients.All.SendAsync("UpdpateYourselves");
         }
 
         //public async Task ToggleMoveState(int playerNumber, int moveDistance,GameBoardState newState)
@@ -63,7 +70,7 @@ namespace BlazorApp.Hubs
         //    {
         //        var r = GHGameManager.GetPossibleMoveHexes(playerNumber, moveDistance);
         //        Clients.Caller.SendAsync("EnableMoveState", r);
-              
+
         //    }
         //    else
         //    {
@@ -75,6 +82,6 @@ namespace BlazorApp.Hubs
 
         //}
 
-       
+
     }
 }

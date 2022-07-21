@@ -45,7 +45,7 @@ namespace BlazorApp.GH
             var retVal = GHGameManager.GameState.Players.FirstOrDefault(_ => _.PlayerNumber == playerNumber);
 
             if (retVal == null)
-                throw new Exception("hrac s danym cislom nie je ");
+                throw new Exception($"Player with number:[{playerNumber}] isnt in the game.");
 
             return retVal;
         }
@@ -68,6 +68,11 @@ namespace BlazorApp.GH
         public static CharacterComponent GetCharacterComponent(Player player)
         {
             return GetHexByPlayer(player).Components.First(c => c is CharacterComponent) as CharacterComponent;
+        }
+
+        public static Hex GetHexById(short id)
+        {
+            return GHGameManager.GloomhavenHexes.First(h => h.Id == id);
         }
     }
 }
