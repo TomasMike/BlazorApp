@@ -19,7 +19,7 @@ namespace BlazorApp.Hubs
     {
         public async Task SendMessage(string user, string message)
         {
-            // await Clients.All.SendMessage(user, message);
+             //await Clients.All.SendMessage(user, message);
         }
 
         public async Task HexClicked(string hexId)
@@ -44,18 +44,23 @@ namespace BlazorApp.Hubs
         }
 
 
-        public async Task StartClicked(int levelToLoad)
+        //public async Task StartClicked(int levelToLoad)
+        //{
+        //    var objectsToInit = GHGameManager.StartLevel(levelToLoad);
+
+        //    foreach (var item in objectsToInit)
+        //    {
+        //        SpawnObject(item.Component, item.TopCord, item.LeftCord);
+        //    }
+
+        //    GHGameManager.GameState.ActivePlayer = GHGameManager.GameState.Players.First();
+
+
+        //}
+
+        public async Task UpdateAllClients()
         {
-            var objectsToInit = GHGameManager.StartLevel(levelToLoad);
-
-            foreach (var item in objectsToInit)
-            {
-                SpawnObject(item.Component, item.TopCord, item.LeftCord);
-            }
-
-            GHGameManager.GameState.ActivePlayer = GHGameManager.GameState.Players.First();
-
-
+           await Clients.All.SendAsync("UpdateYourselves");
         }
 
         public async Task Move(int playerNumber, short hexId)

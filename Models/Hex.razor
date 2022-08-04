@@ -72,7 +72,7 @@
     public int Column { get; set; }
 
     [Parameter]
-    public short Id { get; set; }
+    public int Id { get; set; }
 
 
     public List<GameComponentBase> Components = new List<GameComponentBase>();
@@ -167,7 +167,7 @@
         {
             sb.AppendLine($"<p style=\"color:{component.GetComponentColors().TextColor};background-color:{component.GetComponentColors().BackColor}\">{component.DisplayText()}");
         }
-        sb.Append("<p style=\"color:red\">test</p>");
+        //sb.Append("<p style=\"color:red\">test</p>");
         return new MarkupString(sb.ToString());
     }
 

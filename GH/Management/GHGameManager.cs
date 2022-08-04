@@ -17,10 +17,17 @@ namespace BlazorApp.GH.Management
         // TODO stale na flat je to zatial
         public static HexOrientation HexOrientationConfiguration;
 
-        public static GameState GameState;
-        public static Gloomhaven GloomhavenInstance => GameState.GHInstance;
-        public static List<Hex> GloomhavenHexes => GameState.GHInstance.Hexes;
- 
+        public readonly static GameState GameState = new GameState();
+        
+
+        //private static GameState gameState;
+
+        //public static Gloomhaven GloomhavenInstance => GameState.GHInstance;
+        //public static List<Hex> GloomhavenHexes => GameState.GHInstance.Hexes;
+
+        
+
+
         public static List<SpawnObjectPart> StartLevel(int level)
         {
             GameState.Players = new List<Player>
@@ -30,6 +37,15 @@ namespace BlazorApp.GH.Management
 
 
             var retVal = LevelLibrary.Levels[level];
+
+            int idCounter = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    GameState.Hexes.Add(new HexDO(idCounter++) { Row = i, Column = j });
+                }
+            }
 
             foreach (var item in retVal)
             {
@@ -43,7 +59,7 @@ namespace BlazorApp.GH.Management
             return retVal;
         }
 
-        public static void Move(GameComponentBase component, Hex destinationHex)
+        public static void Move(GameComponentBase component, HexDO destinationHex)
         {
             var originHex = Helper.GetHexByComponent(component);
 
@@ -52,16 +68,15 @@ namespace BlazorApp.GH.Management
         }
     }
 
+
     public class GameState
     {
-        public GameState(Gloomhaven gh)
+        public GameState()
         {
-            GHInstance = gh;
-            Players = new List<Player>();
         }
-        public Gloomhaven GHInstance;
+        public List<HexDO> Hexes = new List<HexDO>();
 
-        public List<Player> Players;
+        public List<Player> Players = new List<Player>();
 
         public GameBoardState GBState;
 

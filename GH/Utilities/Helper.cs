@@ -19,20 +19,20 @@ namespace BlazorApp.GH
         /// </summary>
         /// <param name="column"></param>
         /// <param name="row"></param>
-        public static Hex GetHexByCoord(int column, int row)
+        public static HexDO GetHexByCoords(int column, int row)
         {
-            return GHGameManager.GameState.GHInstance.GetHexByCoords(column, row);
+            return GHGameManager.GameState.Hexes.FirstOrDefault(h => h.Column == column && h.Row == row);
         }
         public static bool DoesHexExist(int column, int row)
         {
-            return GetHexByCoord(column,row) != null;
+            return GetHexByCoords(column,row) != null;
         }
 
 
         public static List<GameComponentBase> GetAllComponentsInPlay()
         {
             var retVal = new List<GameComponentBase>();
-            foreach (var hex in GHGameManager.GloomhavenHexes)
+            foreach (var hex in GHGameManager.GameState.Hexes)
             {
                 retVal.AddRange(hex.Components);
             }
@@ -50,19 +50,19 @@ namespace BlazorApp.GH
             return retVal;
         }
 
-        public static Hex GetHexByPlayer(Player player)
+        public static HexDO GetHexByPlayer(Player player)
         {
             return GetAllComponentsInPlay().First(_ => _.Id == player.FigureId).GetCurrentLocationHex();
         }
 
-        public static List<Hex> GetPossibleMoveHexes(Player player, int moveDistance)
+        public static List<HexDO> GetPossibleMoveHexes(Player player, int moveDistance)
         {
             return GetHexByPlayer(player).GetHexesInRange(moveDistance);
         }
 
-        public static Hex GetHexByComponent(GameComponentBase component)
+        public static HexDO GetHexByComponent(GameComponentBase component)
         {
-            return GHGameManager.GloomhavenHexes.FirstOrDefault(h => h.Components.Contains(component));
+            return GHGameManager.GameState.Hexes.FirstOrDefault(h => h.Components.Contains(component));
         }
 
         public static CharacterComponent GetCharacterComponent(Player player)
@@ -70,9 +70,12 @@ namespace BlazorApp.GH
             return GetHexByPlayer(player).Components.First(c => c is CharacterComponent) as CharacterComponent;
         }
 
-        public static Hex GetHexById(short id)
+        public static HexDO GetHexById(short id)
         {
-            return GHGameManager.GloomhavenHexes.First(h => h.Id == id);
+            return GHGameManager.GameState.Hexes.First(h => h.Id == id);
         }
+
+      
+
     }
 }

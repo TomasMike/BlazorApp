@@ -18,21 +18,18 @@ namespace BlazorApp.GH.Utilities
         /// </summary>
         /// <param name="column"></param>
         /// <param name="row"></param>
-        public static Hex GetHexByCoords(this Gloomhaven gh, int column, int row)
+      
+
+        public static HexDO GetCurrentLocationHex(this GameComponentBase c)
         {
-            return gh.Hexes.FirstOrDefault(h => h.Column == column && h.Row == row);
+            return GHGameManager.GameState.Hexes.First(_ => _.Components.Contains(c));
         }
 
-        public static Hex GetCurrentLocationHex(this GameComponentBase c)
+        public static List<HexDO> GetHexesInRange(this HexDO h, int range)
         {
-            return GHGameManager.GloomhavenHexes.First(_ => _.Components.Contains(c));
-        }
+            var retVal = new List<HexDO>();
 
-        public static List<Hex> GetHexesInRange(this Hex h, int range)
-        {
-            var retVal = new List<Hex>();
-
-            Action<int, Hex> f = null;
+            Action<int, HexDO> f = null;
 
             f = (i, currentHex) =>
             {
@@ -62,23 +59,23 @@ namespace BlazorApp.GH.Utilities
         /// </summary>
         /// <param name="h"></param>
         /// <returns></returns>
-        public static List<Hex> GetNeighbourHexes(this Hex h)
+        public static List<HexDO> GetNeighbourHexes(this HexDO h)
         {
             //TODO dependent on the hex orientation
             // odd vertical
 
             var isEvenColumn = h.Column.IsEven();
 
-            return new List<Hex>
+            return new List<HexDO>
             {
-                Helper.GetHexByCoord(h.Column    , h.Row - 1), //above
-                Helper.GetHexByCoord(h.Column    , h.Row + 1), //below
+                Helper.GetHexByCoords(h.Column    , h.Row - 1), //above
+                Helper.GetHexByCoords(h.Column    , h.Row + 1), //below
 
-                Helper.GetHexByCoord(h.Column - 1, isEvenColumn ? h.Row - 1 : h.Row    ), //up left
-                Helper.GetHexByCoord(h.Column - 1, isEvenColumn ? h.Row     : h.Row + 1), //down left
+                Helper.GetHexByCoords(h.Column - 1, isEvenColumn ? h.Row - 1 : h.Row    ), //up left
+                Helper.GetHexByCoords(h.Column - 1, isEvenColumn ? h.Row     : h.Row + 1), //down left
 
-                Helper.GetHexByCoord(h.Column + 1, isEvenColumn ? h.Row - 1 : h.Row    ), //up right
-                Helper.GetHexByCoord(h.Column + 1, isEvenColumn ? h.Row     : h.Row + 1)  //down right
+                Helper.GetHexByCoords(h.Column + 1, isEvenColumn ? h.Row - 1 : h.Row    ), //up right
+                Helper.GetHexByCoords(h.Column + 1, isEvenColumn ? h.Row     : h.Row + 1)  //down right
             }.Where(_ => _ != null).ToList();
         }
 
@@ -87,5 +84,23 @@ namespace BlazorApp.GH.Utilities
             return i % 2 == 0;
         }
 
+        public static Hex ToLocalHex(this HexDO hex, Gloomhaven gloomhaven)
+        {
+            return gloomhaven.Hexes.First(h => h.Id == hex.Id);
+        }
+
+        public static void UpdateHexes(this IEnumerable<Hex> destinationHexes, IEnumerable<HexDO> sourceHexes)
+        {
+            foreach (var sourceHex in sourceHexes)
+            {
+                var destHex = destinationHexes.First(h => h.Id == sourceHex.Id);
+
+                destHex.Components.Clear();
+                foreach (var c in sourceHex.Components)
+                {
+                    destHex.Components.Add(c);
+                }
+            }
+        }
     }
 }

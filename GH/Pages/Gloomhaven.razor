@@ -29,14 +29,23 @@
             <td style="width:80%;height:80%">
                 <div style="position: relative; margin-top: 30px; position: relative; height:100%;">
                     @{
-                        short id = 0;
-                        for (int i = 0; i < 4; i++)
+                        Console.WriteLine("");
+
+
+                        List<BlazorApp.GH.HexDO> hexyGetnuteZoSetupu = GHGameManager.GameState.Hexes;
+
+                        foreach (var hex in hexyGetnuteZoSetupu)
+                        {
+                            <Hex Column="hex.Column" Row="hex.Row" Board="this" Id="hex.Id"></Hex>
+                        }
+
+                        @*for (int i = 0; i < 4; i++)
                         {
                             for (int j = 0; j < 4; j++)
                             {
                                 <Hex Column="j" Row="i" Board="this" Id="id++"></Hex>
                             }
-                        }
+                        }*@
                     }
                 </div>
             </td>
@@ -81,17 +90,14 @@
     private string MoveButtonText => GHGameManager.GameState.GBState == GameBoardState.Move ? "Cancel Move" : "Move";
 
 
-    private void StartGame()
-    {
-        //var x = JS.InvokeAsync<bool>("confirm", "si si isty?");
-    }
+
 
 
     protected override async Task OnInitializedAsync()
     {
         #region SIGNALR
 
-        GHGameManager.GameState = new GameState(this);
+        //GHGameManager.GameState = new GameState(this);
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/gloomhavenHub"))
             .Build();
@@ -106,7 +112,7 @@
 
         hubConnection.On<string, int, int>("SpawnCharacter", (json, row, col) =>
         {
-            var h = this.GetHexByCoords(col, row);
+            var h = Helper.GetHexByCoords(col, row);
             var obj = JsonConvert.DeserializeObject<CharacterComponent>(json);
             if (h != null)
                 h.Components.Add(obj);
@@ -126,7 +132,7 @@
 
         hubConnection.On<string, int, int>("SpawnTerrainComponent", (json, row, col) =>
         {
-            var h = this.GetHexByCoords(row, col);
+            var h = Helper.GetHexByCoords(row, col);
             var obj = JsonConvert.DeserializeObject<TerrainComponent>(json);
             if (h != null)
                 h.Components.Add(obj);
@@ -138,9 +144,14 @@
             StateHasChanged();
         });
 
-        hubConnection.On("UpdateYourselves",() =>
+        hubConnection.On("UpdateYourselves", () =>
         {
 
+            Hexes.UpdateHexes(GHGameManager.GameState.Hexes);
+            StateHasChanged();
+
+
+            Console.WriteLine("sa updatnem");
         });
 
 
@@ -161,6 +172,7 @@
             Console.WriteLine($"hubConnection is {hubConnection.State}");
         }
 
+        StateHasChanged();
         Console.WriteLine($"Board connected.");
         #endregion
     }
@@ -189,7 +201,12 @@
 
     public async Task Start()
     {
-        await hubConnection.SendAsync("StartClicked", int.Parse(levelPickValueRef));
+        //await hubConnection.SendAsync("StartClicked", int.Parse(levelPickValueRef));
+
+        GHGameManager.StartLevel(int.Parse(levelPickValueRef));
+        await hubConnection.SendAsync("UpdateAllClients");
+        //update singleton instanciu, nech sa do nespawnu a potom cez hub zavolat nech si kazdy updatne gloomhaven
+
         //Hexes.FirstOrDefault()?.Components.Add(new Character() { CharacterType = CharacterType.Mindthief });
         //StateHasChanged();
         //await hubConnection.SendAsync("StartClicked");
@@ -216,13 +233,15 @@
 
         if (GHGameManager.GameState.GBState == GameBoardState.Move)
         {
-            Helper.GetHexByPlayer(GHGameManager.GameState.ActivePlayer).ChangeColor(GlobalSettings.ActionOriginHexColor);
+            Helper.GetHexByPlayer(GHGameManager.GameState.ActivePlayer).ToLocalHex(this).ChangeColor(GlobalSettings.ActionOriginHexColor);
 
             var validOptionHexes = Helper.GetPossibleMoveHexes(GHGameManager.GameState.ActivePlayer, 1);
             foreach (var h in validOptionHexes)
             {
-                h.HexClicked += ClickToMove;
-                h.ChangeColor(GlobalSettings.ClickableOptionHexColor);
+                var hex = Hexes.First(a => a.Id == h.Id);
+
+                hex.HexClicked += ClickToMove;
+                hex.ChangeColor(GlobalSettings.ClickableOptionHexColor);
             }
         }
         else
@@ -262,5 +281,7 @@
     {
         StateHasChanged();
     }
+
+
 
 }
